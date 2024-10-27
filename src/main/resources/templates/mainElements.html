@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div th:fragment="loginHeader">
+    <nav class="navbar bg-light">
+        <div class="container-fluid d-flex align-items-center" style="height: 100%;">
+            <!-- Первая часть: пустое пространство -->
+            <div class="col-4"></div>
+
+            <!-- Вторая часть: текст по центру -->
+            <div class="col-4 text-center">
+                <h2 th:text="${user.getUsername()}"></h2>
+            </div>
+
+            <!-- Третья часть: делится на 3 части -->
+            <div class="col-4 d-flex justify-content-between align-items-center">
+                <!-- Первая часть: пустое пространство -->
+                <div class="col-4"></div>
+
+                <!-- Вторая часть: поле поиска с кнопкой -->
+                <div class="col-4 d-flex align-items-center">
+<!--                    <input type="text" class="form-control" placeholder="Поиск..." style="margin-right: 5px;">-->
+<!--                    <button class="btn btn-outline-primary" type="button">Найти</button>-->
+                </div>
+
+                <!-- Третья часть: кнопка выхода справа -->
+                <div class="col-4 d-flex justify-content-end">
+                    <form th:action="@{/logout}" method="post">
+                        <button class="btn btn-outline-secondary" type="submit">Выход</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+</div>
+
+<div th:fragment="noLoginBody">
+    <div class="container-fluid px-4 py-5 my-5 text-center ">
+        <div class="lc-block mb-4">
+            <div editable="rich">
+                <h2 class="display-2 fw-bold">Сохрани файлы <span class="text-primary">Тут и Сейчас</span></h2>
+            </div>
+        </div>
+        <div class="lc-block col-lg-6 mx-auto mb-5">
+            <div editable="rich">
+
+                <p class="lead">Быстрое сохранение файлов в привычном виде.</p>
+            </div>
+        </div>
+
+        <div class="lc-block d-grid gap-2 d-sm-flex justify-content-sm-center mb-5">
+            <a class="btn btn-outline-secondary btn-lg px-4 gap-3" href="login" role="button">Вход</a>
+            <a class="btn btn-primary btn-lg px-4" href="registration" role="button">Регистрация</a>
+        </div>
+        <div class="lc-block d-grid gap-2 d-sm-flex justify-content-sm-center" style="height: 45vh">
+            <img class="img-fluid" src="https://www.svgrepo.com/show/527038/file-right.svg" width="auto" height="auto"
+                 srcset="" sizes="" alt="">
+            <img class="img-fluid" src="https://www.svgrepo.com/show/527039/file-smile.svg" width="auto" height="auto"
+                 srcset="" sizes="" alt="">
+            <img class="img-fluid" src="https://www.svgrepo.com/show/527035/file-left.svg" width="auto" height="auto"
+                 srcset="" sizes="" alt="">
+        </div>
+    </div>
+</div>
+
+<div th:fragment="breadCrmbTest">
+    <nav class="ms-3" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <th:block th:each="item: ${breadList}">
+                <li class="breadcrumb-item">
+                    <a th:text="${item.name}"  th:href="${currentUrl + item.path + '/' }"></a>
+                </li>
+            </th:block>
+        </ol>
+    </nav>
+</div>
+
+<div th:fragment="uploadObjects">
+    <form id="file-upload-form" th:action="@{/mainPage/filePage}" method="post" enctype="multipart/form-data"
+          class="p-3 border rounded file-upload-form me-3">
+        <div id="drop-area" class="border border-primary rounded p-4 text-center mb-3">
+            <p class="mb-2">Перетащите файлы сюда или нажмите, чтобы выбрать файлы</p>
+            <input type="file" id="file" name="file" multiple style="display: none;"/>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">Отправить</button>
+        </div>
+    </form>
+
+    <script>
+        const dropArea = document.getElementById('drop-area');
+        const fileInput = document.getElementById('file');
+
+        // Предотвращаем поведение по умолчанию при перетаскивании
+        ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false)
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Подсветка при перетаскивании
+        ;['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.classList.add('highlight'), false)
+        });
+
+        ;['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.classList.remove('highlight'), false)
+        });
+
+        // Обработка перетаскивания файлов
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            fileInput.files = files;
+        }
+
+        // Нажатие на область для выбора файлов
+        dropArea.addEventListener('click', () => fileInput.click());
+    </script>
+
+    <style>
+        #file-upload-form {
+            width: 20%; /* Задаем ширину 20% */
+            margin-left: auto; /* Чтобы форма была прижата к правому краю */
+            margin-right: 0;
+        }
+
+        #drop-area {
+            border: 2px dashed #007bff;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #drop-area.highlight {
+            background-color: #e9f7ff;
+        }
+    </style>
+
+</div>
+
+<div th:fragment="uploadDirectory">
+    <form id="directory-upload-form" th:action="@{/mainPage/filePage}" method="post" enctype="multipart/form-data"
+          class="p-3 border rounded directory-upload-form me-3">
+        <div id="drop-area2" class="border border-primary rounded p-4 text-center mb-3">
+            <p class="mb-2">Перетащите папку сюда или нажмите, чтобы выбрать папку</p>
+            <input type="file" id="fileDirect" name="file" multiple webkitdirectory style="display: none;"/>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">Отправить</button>
+        </div>
+    </form>
+
+    <script>
+        const dropArea = document.getElementById('drop-area2');
+        const fileInput = document.getElementById('fileDirect');
+
+        // Предотвращаем поведение по умолчанию при перетаскивании
+        ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false)
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Подсветка при перетаскивании
+        ;['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.classList.add('highlight'), false)
+        });
+
+        ;['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.classList.remove('highlight'), false)
+        });
+
+        // Обработка перетаскивания папок
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            fileInput.files = files;
+        }
+
+        // Нажатие на область для выбора папки
+        dropArea.addEventListener('click', () => fileInput.click());
+    </script>
+
+    <style>
+        #directory-upload-form {
+            width: 20%; /* Задаем ширину 20% */
+            margin-left: auto; /* Чтобы форма была прижата к правому краю */
+            margin-right: 0;
+        }
+
+        #drop-area2 {
+            border: 2px dashed #007bff;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #drop-area2.highlight {
+            background-color: #e9f7ff;
+        }
+    </style>
+</div>
+
+<div th:fragment="uploadAllEasy">
+    <div style="display: flex; justify-content: space-between; gap: 1rem;">
+        <div style="width: 48%; display: flex; flex-direction: column; align-items: center; border: 2px solid #ccc; border-radius: 10px; padding: 20px; margin: 0 1rem;">
+            <form th:action="@{/uploadFile}" method="post" enctype="multipart/form-data"
+                  style="display: flex; flex-direction: column; align-items: center;">
+                <div style="text-align: center;">
+                    <input type="hidden" th:name="currentUrl" th:value="${currentFolder}">
+                    <label for="uploadAllEasyFile">Выберите файлы для загрузки</label>
+                    <br>
+                    <input type="file" id="uploadAllEasyFile" name="file" multiple/>
+                </div>
+                <div style="margin-top: 10px;">
+                    <button type="submit" class="btn btn-outline-secondary">Загрузить</button>
+                </div>
+            </form>
+        </div>
+        <div style="width: 48%; display: flex; flex-direction: column; align-items: center; border: 2px solid #ccc; border-radius: 10px; padding: 20px; margin: 0 1rem;">
+            <form th:action="@{/uploadFile}" method="post" enctype="multipart/form-data"
+                  style="display: flex; flex-direction: column; align-items: center;">
+                <div style="text-align: center;">
+                    <input type="hidden" th:name="currentUrl" th:value="${currentFolder}">
+                    <label for="uploadAllEasyDirect">Выберите папку для загрузки</label>
+                    <br>
+                    <input type="file" id="uploadAllEasyDirect" name="file" multiple webkitdirectory/>
+                </div>
+                <div style="margin-top: 10px;">
+                    <button type="submit" class="btn btn-outline-secondary">Загрузить</button>
+                </div>
+            </form>
+        </div>
+
+        <div style="width: 30%; display: flex; flex-direction: column; align-items: center; border: 2px solid #ccc; border-radius: 10px; padding: 20px; margin: 0 1rem;">
+            <form th:action="@{/createFolder}" method="post"
+                  style="display: flex; flex-direction: column; align-items: center;">
+                <div style="text-align: center;">
+                    <input type="hidden" th:name="currentUrl" th:value="${currentFolder}">
+                    <label for="textInput">Введите название новой папки</label>
+                    <br>
+                    <input th:type="text" id="textInput" th:name="folderName"/>
+                </div>
+                <div style="margin-top: 10px;">
+                    <button type="submit" class="btn btn-outline-secondary">Создать папку</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<div th:fragment="testCreateFolder">
+    <form th:action="@{/createFolder}" method="post">
+        <input type="text" name="folderName" id="folderName">
+        <button type="submit">Создать</button>
+    </form>
+</div>
+
+<div th:fragment="searchBlock" style="display: flex; justify-content: center;">
+    <form th:action="@{/search}" method="post">
+        <input type="text" th:name="searchQuery">
+        <button type="submit" class="btn btn-outline-secondary">Поиск</button>
+    </form>
+</div>
+
+<div th:fragment="searchContent">
+    <ol class="ms-3" style="list-style-type: none; padding-left: 0;">
+        <th:block th:each="item : ${objectDtoList}">
+            <li style="display: flex; align-items: center; justify-content: space-between;">
+                <!-- Блок для иконки и ссылки занимает 30% -->
+                <div style="flex: 0 0 30%; display: flex; align-items: center;">
+                    <span th:if="${item.isDirectory}">
+                        <img src="https://www.svgrepo.com/show/529608/folder.svg" alt="icon"
+                             style="height: 100%; max-height: 30px; margin-right: 10px;"/>
+                        <a th:text="${item.name}" th:href="${currentUrl + item.encodePath}"></a>
+                    </span>
+                    <span th:if="${!item.isDirectory}">
+                        <img src="https://www.svgrepo.com/show/528979/full-screen.svg" alt="icon"
+                             style="height: 100%; max-height: 30px; margin-right: 10px;"/>
+                        <a th:text="${item.name}"></a>
+                    </span>
+                </div>
+
+                <!-- Блок для форм переименования и удаления занимает 70% -->
+                <div style="flex: 1; display: flex; align-items: center;">
+
+                    <span th:if="${item.isDirectory}">
+                        <form th:action="@{/copyFolderSearch}" method="post"
+                              style="margin-left: 10px; display: inline-flex; align-items: center;">
+                        <input type="hidden" th:name="nameFolder" th:value="${item.name}">
+                        <input type="hidden" th:name="pathFolder" th:value="${item.path}">
+                        <input type="text" th:name="newFileName" class="form-control"
+                               placeholder="Новое имя"
+                               style="border-radius: 4px; font-size: 12px; height: auto; padding: 2px 8px; margin-right: 5px;">
+                        <button type="submit" class="btn btn-outline-secondary"
+                                style="border-radius: 4px; font-size: 12px; padding: 2px 8px;">
+                            Переименовать
+                        </button>
+                    </form>
+
+                    <form th:action="@{/deleteFolderSearch}" method="post"
+                          style="margin-left: 10px; display: inline;">
+                        <input type="hidden" th:name="nameFolder" th:value="${item.name}">
+                        <input type="hidden" th:name="pathFolder" th:value="${item.path}">
+                        <button type="submit" class="btn btn-outline-secondary"
+                                style="border-radius: 4px; padding: 2px 8px; font-size: 12px;">Удалить</button>
+                    </form>
+
+                    </span>
+
+
+                    <span th:if="${!item.isDirectory}">
+
+                    <form th:action="@{/copyFileSearch}" method="post"
+                              style="margin-left: 10px; display: inline-flex; align-items: center;">
+                            <input type="hidden" th:name="fileName" th:value="${item.name}">
+                            <input type="hidden" th:name="filePath" th:value="${item.path}">
+                            <input type="text" th:name="newFileName" class="form-control"
+                                   placeholder="Новое имя"
+                                   style="border-radius: 4px; font-size: 12px; height: auto; padding: 2px 8px; margin-right: 5px;">
+                         <button type="submit" class="btn btn-outline-secondary"
+                                 style="border-radius: 4px; font-size: 12px; padding: 2px 8px;">
+                                                Переименовать
+                         </button>
+                    </form>
+                    <form th:action="@{/deleteFileSearch}" method="post"
+                          style="margin-left: 10px; display: inline;">
+                            <input type="hidden" th:name="fileName" th:value="${item.name}">
+                            <input type="hidden" th:name="filePath" th:value="${item.path}">
+                            <button type="submit" class="btn btn-outline-secondary"
+                                    style="border-radius: 4px; padding: 2px 8px; font-size: 12px;">Удалить</button>
+                    </form>
+                    </span>
+                </div>
+            </li>
+        </th:block>
+    </ol>
+</div>
+
+
+</body>
+</html>
