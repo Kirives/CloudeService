@@ -24,6 +24,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 @Controller
 @RequestMapping
@@ -65,9 +66,9 @@ public class MainControllers {
 
     @PostMapping("/search")
     public String search2(@AuthenticationPrincipal UsersDetails usersDetails,@RequestParam("searchQuery") String searchQuery,Model model,HttpServletRequest request) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        String paramQuery = "?searchQuery="+searchQuery;
+        String paramQuery = searchQuery;
         String pathParamEncode = URLEncoder.encode(paramQuery, StandardCharsets.UTF_8);
-        return "redirect:/search"+pathParamEncode;
+        return "redirect:/search"+"?searchQuery="+pathParamEncode;
     }
 
     @GetMapping("/search")
@@ -76,8 +77,11 @@ public class MainControllers {
         builder.queryParam("path", "");
         model.addAttribute("currentUrl", builder.toUriString());
         List<ObjectDto> objectDtoList = new ArrayList<>();
-        objectDtoList.addAll(minioService.searchAllFolders(usersDetails.getID(),searchQuery));
-        objectDtoList.addAll(minioService.searchAllFiles(usersDetails.getID(),searchQuery));
+        Predicate<String> searchQueryPredicate = name -> name.contains(searchQuery);
+//        objectDtoList.addAll(minioService.searchAllFolders(usersDetails.getID(),searchQuery));
+//        objectDtoList.addAll(minioService.searchAllFiles(usersDetails.getID(),searchQuery));
+        String path = "user-" + usersDetails.getID() + "-files";
+        objectDtoList.addAll(minioService.getFromSearch(usersDetails.getID(),searchQueryPredicate));
 
         model.addAttribute("objectDtoList", objectDtoList);
         model.addAttribute("user", usersDetails);
