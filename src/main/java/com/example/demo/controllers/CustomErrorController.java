@@ -9,11 +9,9 @@ public class CustomErrorController implements ErrorController {
 
     @RequestMapping("/error")
     public String handleError() {
-        // Логика перенаправления на главную страницу
         return "redirect:/";
     }
 
-    // Если требуется, можно переопределить метод для возврата пути ошибки
     public String getErrorPath() {
         return "/error";
     }

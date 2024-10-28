@@ -8,18 +8,6 @@ import java.util.List;
 
 @Service
 public class ParamService {
-    public List<String> getFolders(List<String> allFiles, int id){
-        List<String> folderList = new ArrayList<String>();
-        for(String result : allFiles) {
-            List<String> mini = List.of(result.split("/"));
-            if(result.charAt(result.length()-1) == '/') {
-                if(!mini.get(mini.size()-1).equals("user-"+String.valueOf(id)+"-files")){
-                    folderList.add(mini.get(mini.size()-1));
-                }
-            }
-        }
-        return folderList;
-    }
 
     public List<BreadDto> getBread(String path){
         List<BreadDto> test = new ArrayList<>();

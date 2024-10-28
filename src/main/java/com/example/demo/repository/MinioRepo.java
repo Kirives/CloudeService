@@ -55,8 +55,8 @@ public class MinioRepo {
         minioClient.putObject(
                 PutObjectArgs.builder()
                         .bucket("user-files")
-                        .object(folderName + "/")  // Объект с завершающим "/"
-                        .stream(new ByteArrayInputStream(new byte[]{}), 0, -1)  // Пустой поток
+                        .object(folderName + "/")
+                        .stream(new ByteArrayInputStream(new byte[]{}), 0, -1)
                         .build()
         );
     }

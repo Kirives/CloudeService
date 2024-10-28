@@ -37,7 +37,7 @@ public class MainControllers {
     private ParamService paramService;
 
     @GetMapping("/")
-    public String mainPage(@AuthenticationPrincipal UsersDetails usersDetails, Model model, HttpServletRequest httpRequest) {
+    public String mainPage(@AuthenticationPrincipal UsersDetails usersDetails) {
         if (usersDetails == null) {
             return "mainPage";
         } else {
@@ -78,11 +78,7 @@ public class MainControllers {
         model.addAttribute("currentUrl", builder.toUriString());
         List<ObjectDto> objectDtoList = new ArrayList<>();
         Predicate<String> searchQueryPredicate = name -> name.contains(searchQuery);
-//        objectDtoList.addAll(minioService.searchAllFolders(usersDetails.getID(),searchQuery));
-//        objectDtoList.addAll(minioService.searchAllFiles(usersDetails.getID(),searchQuery));
-        String path = "user-" + usersDetails.getID() + "-files";
         objectDtoList.addAll(minioService.getFromSearch(usersDetails.getID(),searchQueryPredicate));
-
         model.addAttribute("objectDtoList", objectDtoList);
         model.addAttribute("user", usersDetails);
         return"searchPage";
