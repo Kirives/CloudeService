@@ -63,13 +63,6 @@ public class MinioController {
         return "redirect::"+usersDetails.getID()+"?path="+pathParamEncode;
     }
 
-    @PostMapping("/deleteFolderSearch")
-    public String deleteFolderSearch(@AuthenticationPrincipal UsersDetails usersDetails, @RequestParam("nameFolder") String nameFolder , @RequestParam("pathFolder")String pathFolder) throws Exception {
-        minioService.removeFolder(pathFolder+nameFolder);
-        minioService.reCreateFolder(pathFolder);
-        String pathParamEncode = URLEncoder.encode(pathFolder, StandardCharsets.UTF_8);
-        return "redirect::"+usersDetails.getID()+"?path="+pathParamEncode;
-    }
 
     @PostMapping("/copyFileSearch")
     public String copySomethingSearch(@AuthenticationPrincipal UsersDetails usersDetails,@RequestParam("fileName") String fileName ,@RequestParam("filePath")String filePath, @RequestParam(value = "newFileName")String newName) throws Exception {
@@ -78,6 +71,14 @@ public class MinioController {
         minioService.copyObject(filePath+fileName,filePath+newName);
         minioService.removeObject(filePath+fileName);
         String pathParamEncode = URLEncoder.encode(filePath, StandardCharsets.UTF_8);
+        return "redirect::"+usersDetails.getID()+"?path="+pathParamEncode;
+    }
+
+    @PostMapping("/deleteFolderSearch")
+    public String deleteFolderSearch(@AuthenticationPrincipal UsersDetails usersDetails, @RequestParam("nameFolder") String nameFolder , @RequestParam("pathFolder")String pathFolder) throws Exception {
+        minioService.removeFolder(pathFolder+nameFolder);
+        minioService.reCreateFolder(pathFolder);
+        String pathParamEncode = URLEncoder.encode(pathFolder, StandardCharsets.UTF_8);
         return "redirect::"+usersDetails.getID()+"?path="+pathParamEncode;
     }
 
